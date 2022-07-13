@@ -1,0 +1,101 @@
+<!doctype html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>CODE RAIN</title>
+    </head>
+
+    <body>
+        <canvas id="board"/>
+        <script type="text/javascript">
+            const canvas = document.getElementById("board");
+            const ctx = canvas.getContext("2d");
+            const width = window.screen.width;
+            const height = window.screen.height;
+            const black = "rgba(0,0,0,1)";
+            const gray = "rgba(1,1,1,0.1)";
+            const size = 30;
+            const font = size+"px 宋体";
+            const colorMin = 15;
+            const colorMax = 240;
+            const letterMin = 33;
+            const letterMax = 126;
+            const i = Math.ceil(width/size);
+            const j = Math.ceil(height/size);
+            const xs = [i];
+            const fps = 40;
+
+            const init = function(){
+                canvas.width = width;
+                canvas.height = height;
+
+                for(let y=0;y<i;y++){
+                    xs[y] = 0;
+                }
+
+                drawBack(true);
+            };
+
+            const drawBack = function(bg){
+                if(bg){
+                    ctx.fillStyle = black;    
+                }else{
+                    ctx.fillStyle = gray;
+                }
+                ctx.fillRect(0, 0, width, height);                
+            };
+
+            const drawLetter = function(x,y){
+                ctx.font = font;
+                let r = randomColor();
+                let g = randomColor();
+                let b = randomColor();
+                ctx.fillStyle = `rgb(${r},${g},${b})`;
+                ctx.textBaseline = "top";
+                ctx.fillText(randomLetter(), x*size, y*size);
+            };
+
+            const randomColor = function(){
+                return random(colorMin, colorMax);
+            };
+
+            const randomLetter = function(){
+                return String.fromCharCode(random(letterMin, letterMax));
+            };
+
+            const randomTail = function(){
+                return random(0, j);
+            };
+
+            const random = function(min, max){
+              return Math.round(Math.random()*(max-min))+min;  
+            };
+
+            init();
+            setInterval(function(){
+                drawBack(false);
+                for(let y=0;y<i;y++){
+                    let x = xs[y];
+                    if(x==j){
+                        let tail = randomTail();
+                        if(tail==0){
+                            xs[y] = 0;
+                        }else{
+                            xs[y] = x+tail;
+                        }
+                    }else if(x>j){
+                        x--;
+                        if(x==j){
+                            xs[y] = 0;
+                        }else{
+                            xs[y] = x;
+                        }
+                    }else{
+                        drawLetter(y, x);
+                        xs[y] = x+1;
+                    }
+                }
+            }, 1000/fps);
+        </script>
+    </body>
+</html>
